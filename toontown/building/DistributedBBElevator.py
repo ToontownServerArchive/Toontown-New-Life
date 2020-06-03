@@ -15,7 +15,7 @@ class DistributedBBElevator(DistributedBossElevator.DistributedBossElevator):
 
     def setupElevator(self):
         geom = base.cr.playGame.hood.loader.geom
-        self.elevatorModel = loader.loadModel('phase_12/models/bossbotHQ/BB_Elevator')
+        self.elevatorModel = loader.loadModel('phase_5/models/cogdominium/tt_m_ara_csa_elevatorB')
         self.leftDoor = self.elevatorModel.find('**/left-door')
         if self.leftDoor.isEmpty():
             self.leftDoor = self.elevatorModel.find('**/left_door')
@@ -24,6 +24,8 @@ class DistributedBBElevator(DistributedBossElevator.DistributedBossElevator):
             self.rightDoor = self.elevatorModel.find('**/right_door')
         locator = geom.find('**/elevator_locator')
         self.elevatorModel.reparentTo(locator)
+        self.elevatorModel.setScale(2)
+        self.elevatorModel.setPos(0, -4.5, 0)
         DistributedElevator.DistributedElevator.setupElevator(self)
 
     def getDestName(self):

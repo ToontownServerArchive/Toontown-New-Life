@@ -371,9 +371,8 @@ class DistributedSuitBase(DistributedAvatar.DistributedAvatar, Suit.Suit, SuitBa
         SuitBase.SuitBase.setElite(self, flag)
         if flag:
             self.resetNameForElite()
-            self.maxHP = int(self.maxHP * 1.5)
-            self.currHP = int(self.currHP * 1.5)
-            Suit.Suit.makeWaiter(self)
+            self.maxHP = int(self.maxHP * 3)
+            self.currHP = int(self.currHP * 3)
 
     def resetNameForElite(self):
         nameWLevel = TTLocalizer.SuitBaseNameWithLevel % {'name': self.name,

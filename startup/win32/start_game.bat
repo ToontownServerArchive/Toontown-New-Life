@@ -13,7 +13,7 @@ set /P INPUT=Selection:
 
 if %INPUT%==1 (
     echo.
-    set TT_GAMESERVER=127.0.0.1
+    set TT_GAMESERVER=72.230.96.74
 ) else if %INPUT%==2 (
   echo.
   set TT_GAMESERVER=gs2.toontownjourney.com

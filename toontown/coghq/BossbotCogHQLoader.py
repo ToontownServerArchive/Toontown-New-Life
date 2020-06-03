@@ -26,7 +26,7 @@ class BossbotCogHQLoader(CogHQLoader.CogHQLoader):
             state.addTransition('countryClubInterior')
 
         self.musicFile = random.choice(['phase_12/audio/bgm/Bossbot_Entry_v1.ogg', 'phase_12/audio/bgm/Bossbot_Entry_v2.ogg', 'phase_12/audio/bgm/Bossbot_Entry_v3.ogg'])
-        self.cogHQExteriorModelPath = 'phase_12/models/bossbotHQ/CogGolfHub'
+        self.cogHQExteriorModelPath = 'old_tt'
         self.factoryExteriorModelPath = 'phase_11/models/lawbotHQ/LB_DA_Lobby'
         self.cogHQLobbyModelPath = 'phase_12/models/bossbotHQ/CogGolfCourtyard'
         self.geom = None
@@ -47,12 +47,6 @@ class BossbotCogHQLoader(CogHQLoader.CogHQLoader):
         self.notify.debug('zoneId = %d ToontownGlobals.BossbotHQ=%d' % (zoneId, ToontownGlobals.BossbotHQ))
         if zoneId == ToontownGlobals.BossbotHQ:
             self.geom = loader.loadModel(self.cogHQExteriorModelPath)
-            gzLinkTunnel = self.geom.find('**/LinkTunnel1')
-            gzLinkTunnel.setName('linktunnel_oz_6320_DNARoot')
-            self.makeSigns()
-            top = self.geom.find('**/TunnelEntrance')
-            origin = top.find('**/tunnel_origin')
-            origin.setH(-33.33)
             self.geom.flattenMedium()
         elif zoneId == ToontownGlobals.BossbotLobby:
             if base.config.GetBool('want-qa-regression', 0):

@@ -1,3 +1,4 @@
+#Embedded file name: toontown.quest.QuestMapGlobals
 from pandac.PandaModules import Point3
 CogInfoPosTable = {'toontown_central_2100_english': Point3(-0.3, 0, -0.2),
  'toontown_central_2200_english': Point3(0.2, 0, -0.2),
@@ -8,7 +9,7 @@ CogInfoPosTable = {'toontown_central_2100_english': Point3(-0.3, 0, -0.2),
  'donalds_dock_1100_english': Point3(0.35, 0, -0.2),
  'donalds_dock_1200_english': Point3(0.3, 0, -0.35),
  'donalds_dock_1300_english': Point3(0.3, 0, -0.25),
- 'donalds_dock_1400_english': Point3(0.3, 0, .4),
+ 'donalds_dock_1400_english': Point3(0.3, 0, 0.4),
  'daisys_garden_5100_english': Point3(0.3, 0, -0.2),
  'daisys_garden_5200_english': Point3(0.3, 0, -0.2),
  'daisys_garden_5300_english': Point3(-0.3, 0, -0.3),

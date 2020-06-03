@@ -1,3 +1,4 @@
+#Embedded file name: toontown.quest.BlinkingArrows
 from direct.interval.IntervalGlobal import *
 from pandac.PandaModules import *
 

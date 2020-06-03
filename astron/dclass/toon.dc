@@ -770,6 +770,8 @@ from toontown.distributed import DistributedTimer/AI
 from toontown.suit import DistributedBossbotBoss/AI
 from toontown.coghq import DistributedCogKart/AI
 from toontown.coghq import DistributedCountryClub/AI
+from toontown.coghq.boardbothq import DistributedBoardOffice/AI
+from toontown.coghq.boardbothq import DistributedBoardOfficeRoom/AI
 from toontown.coghq import DistributedCountryClubRoom/AI
 from toontown.coghq import DistributedMoleField/AI
 from toontown.coghq import DistributedCountryClubBattle/AI

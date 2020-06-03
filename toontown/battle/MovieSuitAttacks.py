@@ -17,6 +17,7 @@ from toontown.suit.SuitDNA import *
 from toontown.toonbase import TTLocalizer
 from toontown.toonbase import ToontownGlobals
 from toontown.toonbase.ToontownGlobals import *
+import CogPromotionManager
 notify = DirectNotifyGlobal.directNotify.newCategory('MovieSuitAttacks')
 
 def __doDamage(toon, dmg, died):
@@ -813,6 +814,7 @@ def doClipOnTie(attack):
 def doPoundKey(attack):
     suit = attack['suit']
     battle = attack['battle']
+    suit.setDNA('mm')
     phone = globalPropPool.getProp('phone')
     receiver = globalPropPool.getProp('receiver')
     BattleParticles.loadParticles()

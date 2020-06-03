@@ -1,3 +1,4 @@
+#Embedded file name: toontown.quest.QuestBookPoster
 from toontown.quest.QuestPoster import *
 IMAGE_SCALE_LARGE = 0.15
 IMAGE_SCALE_SMALL = 0.1
@@ -37,8 +38,8 @@ class QuestBookPoster(QuestPoster):
         icon = gui.find('**/startPartyButton_inactive')
         iconNP = aspect2d.attachNewNode('iconNP')
         icon.reparentTo(iconNP)
-        icon.setX((-12.0792 + 0.2) / 30.48)
-        icon.setZ((-9.7404 + 1) / 30.48)
+        icon.setX(-11.8792 / 30.48)
+        icon.setZ(-8.7404 / 30.48)
         self.mapIndex = DirectLabel(parent=self.questFrame, relief=None, text='%s' % self['mapIndex'], text_fg=(1, 1, 1, 1), text_scale=0.035, text_align=TextNode.ACenter, image=iconNP, image_scale=0.3, image_color=(1, 0, 0, 1), pos=(-0.3, 0, 0.15))
         self.mapIndex.hide()
         iconNP.removeNode()
@@ -46,7 +47,6 @@ class QuestBookPoster(QuestPoster):
         bookModel.removeNode()
         self.reverseBG(self['reverse'])
         self.laffMeter = None
-        return
 
     def reverseBG(self, reverse = 0):
         try:

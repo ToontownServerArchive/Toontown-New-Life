@@ -1,3 +1,4 @@
+#Embedded file name: toontown.quest.QuestRewardCounter
 from pandac.PandaModules import *
 from direct.directnotify import DirectNotifyGlobal
 from toontown.quest import Quests

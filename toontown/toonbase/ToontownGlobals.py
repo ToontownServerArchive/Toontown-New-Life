@@ -265,6 +265,7 @@ BossbotCountryClubIntB = 10600
 BossbotCountryClubIntC = 10700
 SellbotHQ = 11000
 SellbotLobby = 11100
+SellbotSalesEntry = 11160
 SellbotFactoryExt = 11200
 SellbotFactoryInt = 11500
 CashbotHQ = 12000

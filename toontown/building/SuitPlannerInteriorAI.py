@@ -17,6 +17,7 @@ class SuitPlannerInteriorAI:
         self.zoneId = zone
         self.numFloors = numFloors
         self.respectInvasions = 1
+        self.bossDNA = None
         dbg_defaultSuitName = simbase.config.GetString('suit-type', 'random')
         if dbg_defaultSuitName == 'random':
             self.dbg_defaultSuitType = None
@@ -143,6 +144,7 @@ class SuitPlannerInteriorAI:
         return lvlList
 
     def __setupSuitInfo(self, suit, bldgTrack, suitLevel, suitType):
+        bldgInfo = SuitBuildingGlobals.SuitBuildingInfo[0]
         suitDeptIndex, suitTypeIndex, flags = simbase.air.suitInvasionManager.getInvadingCog()
         if self.respectInvasions:
             if suitDeptIndex is not None:
@@ -152,7 +154,11 @@ class SuitPlannerInteriorAI:
                 suitType = SuitDNA.getSuitType(suitName)
                 suitLevel = min(max(suitLevel, suitType), suitType + 4)
         dna = SuitDNA.SuitDNA()
-        dna.newSuitRandom(suitType, bldgTrack)
+        if suitLevel == bldgInfo[SuitBuildingGlobals.SUIT_BLDG_INFO_BOSS_LVLS]:
+            dna.newSuit('txm')
+        else:    
+            dna.newSuitRandom(suitType, bldgTrack)
+        
         suit.dna = dna
         suit.setLevel(suitLevel)
         return flags
@@ -168,8 +174,7 @@ class SuitPlannerInteriorAI:
             newSuit.b_setWaiter(1)
         if flags & IFV2:
             newSuit.b_setSkeleRevives(1)
-        #if random.random() <= 0.2:
-            #newSuit.b_setElite(1)
+        newSuit.b_setElite(1)
         newSuit.node().setName('suit-%s' % newSuit.doId)
         return newSuit
 

@@ -1,3 +1,4 @@
+#Embedded file name: toontown.quest.QuestMap
 import math
 from pandac.PandaModules import CardMaker, TextNode
 from direct.gui.DirectGui import DirectFrame, DirectLabel, DirectButton
@@ -7,6 +8,7 @@ from toontown.hood import ZoneUtil
 from toontown.toonbase import ToontownGlobals
 from toontown.quest import Quests
 from toontown.suit import SuitPlannerBase
+from toontown.suit import SuitDNA
 from toontown.quest import QuestMapGlobals
 
 class QuestMap(DirectFrame):
@@ -29,6 +31,8 @@ class QuestMap(DirectFrame):
         self.cogInfoFrame.setScale(0.05)
         self.cogInfoFrame.setPos(0, 0, 0.6)
         self.buildingMarkers = []
+        self.suitBuildingMarkers = []
+        self.questBlocks = []
         self.av = av
         self.wantToggle = False
         if base.config.GetBool('want-toggle-quest-map', True):
@@ -46,8 +50,6 @@ class QuestMap(DirectFrame):
         for currHoodInfo in SuitPlannerBase.SuitPlannerBase.SuitHoodInfo:
             tracks = currHoodInfo[SuitPlannerBase.SuitPlannerBase.SUIT_HOOD_INFO_TRACK]
             self.suitPercentage[currHoodInfo[SuitPlannerBase.SuitPlannerBase.SUIT_HOOD_INFO_ZONE]] = tracks
-
-        return
 
     def load(self):
         gui = loader.loadModel('phase_4/models/questmap/questmap_gui')
@@ -84,7 +86,6 @@ class QuestMap(DirectFrame):
         self.gInfo = DirectLabel(parent=self.cogInfoFrame, text_fg=cogInfoTextColor, text='', text_pos=textPos, text_scale=textScale, geom=gIcon, geom_pos=(0, 0, 0), geom_scale=0.6, relief=None)
         self.gInfo.setPos(3.2, 0, 0.5)
         icons.removeNode()
-        return
 
     def updateCogInfo(self):
         currPercentage = self.suitPercentage.get(self.zoneId)
@@ -95,7 +96,6 @@ class QuestMap(DirectFrame):
         self.mInfo['text'] = '%s%%' % currPercentage[2]
         self.sInfo['text'] = '%s%%' % currPercentage[3]
         self.gInfo['text'] = '%s%%' % currPercentage[4]
-        return
 
     def destroy(self):
         self.ignore('questPageUpdated')
@@ -105,7 +105,7 @@ class QuestMap(DirectFrame):
         del self.mapCloseButton
         DirectFrame.destroy(self)
 
-    def putBuildingMarker(self, pos, hpr = (0, 0, 0), mapIndex = None):
+    def putBuildingMarker(self, pos, hpr = (0, 0, 0), mapIndex = None, isSuitBlock = False):
         marker = DirectLabel(parent=self.container, text='', text_pos=(-0.05, -0.15), text_fg=(1, 1, 1, 1), relief=None)
         gui = loader.loadModel('phase_4/models/parties/schtickerbookHostingGUI')
         icon = gui.find('**/startPartyButton_inactive')
@@ -116,7 +116,10 @@ class QuestMap(DirectFrame):
         marker['text'] = '%s' % mapIndex
         marker['text_scale'] = 0.7
         marker['image'] = iconNP
-        marker['image_color'] = (1, 0, 0, 1)
+        if isSuitBlock:
+            marker['image_color'] = (0.5, 0.5, 0.5, 1)
+        else:
+            marker['image_color'] = (1, 0, 0, 1)
         marker['image_scale'] = 6
         marker.setScale(0.05)
         relX, relY = self.transformAvPos(pos)
@@ -124,50 +127,105 @@ class QuestMap(DirectFrame):
         self.buildingMarkers.append(marker)
         iconNP.removeNode()
         gui.removeNode()
-        return
+
+    def putSuitBuildingMarker(self, pos, hpr = (0, 0, 0), blockNumber = None, track = None):
+        if base.localAvatar.buildingRadar[SuitDNA.suitDepts.index(track)]:
+            marker = DirectLabel(parent=self.container, text='', text_pos=(-0.05, -0.15), text_fg=(1, 1, 1, 1), relief=None)
+            icon = self.getSuitIcon(track)
+            iconNP = aspect2d.attachNewNode('suitBlock-%s' % blockNumber)
+            icon.reparentTo(iconNP)
+            marker['image'] = iconNP
+            marker['image_scale'] = 1
+            marker.setScale(0.05)
+            relX, relY = self.transformAvPos(pos)
+            marker.setPos(relX, 0, relY)
+            self.suitBuildingMarkers.append(marker)
+            iconNP.removeNode()
+
+    def putCogdoBuildingMarker(self, pos, hpr = (0, 0, 0), blockNumber = None, track = None):
+        if base.localAvatar.buildingRadar[SuitDNA.suitDepts.index(track)]:
+            marker = DirectLabel(parent=self.container, text='', relief=None)
+            marker['image'] = self.getCogdoIcon(track)
+            marker['image_scale'] = 0.5
+            marker.setTransparency(1)
+            marker.setScale(0.05)
+            relX, relY = self.transformAvPos(pos)
+            marker.setPos(relX, 0, relY)
+            self.suitBuildingMarkers.append(marker)
+
+    def getSuitIcon(self, dept):
+        icons = loader.loadModel('phase_3/models/gui/cog_icons')
+        if dept == 'c':
+            corpIcon = icons.find('**/CorpIcon')
+        elif dept == 's':
+            corpIcon = icons.find('**/SalesIcon')
+        elif dept == 'l':
+            corpIcon = icons.find('**/LegalIcon')
+        elif dept == 'm':
+            corpIcon = icons.find('**/MoneyIcon')
+        elif dept == 'g':
+            corpIcon = icons.find('**/BoardIcon')
+        else:
+            corpIcon = None
+        icons.removeNode()
+        return corpIcon
+
+    def getCogdoIcon(self, dept):
+        if dept == 's':
+            image = 'phase_3.5/maps/sbfo.png'
+        if dept == 'l':
+            image = 'phase_3.5/maps/lbfo.png'
+        else:
+            image = None
+        return image
 
     def updateQuestInfo(self):
         for marker in self.buildingMarkers:
             marker.destroy()
 
         self.buildingMarkers = []
-
-        for (i, questDesc) in enumerate(self.av.quests):
+        self.questBlocks = []
+        for i, questDesc in enumerate(self.av.quests):
             mapIndex = i + 1
             quest = Quests.getQuest(questDesc[0])
             toNpcId = questDesc[2]
-
+            if quest is None:
+                return
             completed = quest.getCompletionStatus(self.av, questDesc) == Quests.COMPLETE
             if not completed:
                 if quest.getType() == Quests.RecoverItemQuest:
                     if quest.getHolder() == Quests.AnyFish:
                         self.putBuildingMarker(self.fishingSpotInfo, mapIndex=mapIndex)
                     continue
-                elif quest.getType() not in (
-                    Quests.DeliverGagQuest, Quests.DeliverItemQuest,
-                    Quests.VisitQuest, Quests.TrackChoiceQuest):
+                elif quest.getType() not in (Quests.DeliverGagQuest,
+                 Quests.DeliverItemQuest,
+                 Quests.VisitQuest,
+                 Quests.TrackChoiceQuest):
                     continue
-
             if toNpcId == Quests.ToonHQ:
                 self.putBuildingMarker(self.hqPosInfo, mapIndex=mapIndex)
                 continue
-
             npcZoneId = NPCToons.getNPCZone(toNpcId)
             hoodId = ZoneUtil.getCanonicalHoodId(npcZoneId)
             branchId = ZoneUtil.getCanonicalBranchZone(npcZoneId)
-
-            if (self.hoodId != hoodId) or (self.zoneId != branchId):
+            if self.hoodId != hoodId or self.zoneId != branchId:
                 continue
-
             for blockIndex in xrange(base.cr.playGame.dnaStore.getNumBlockNumbers()):
                 blockNumber = base.cr.playGame.dnaStore.getBlockNumberAt(blockIndex)
                 zoneId = base.cr.playGame.dnaStore.getZoneFromBlockNumber(blockNumber)
-                interiorZoneId = (zoneId - (zoneId%100)) + 500 + blockNumber
+                interiorZoneId = zoneId - zoneId % 100 + 500 + blockNumber
                 if npcZoneId == interiorZoneId:
-                    self.putBuildingMarker(
-                        base.cr.playGame.dnaStore.getDoorPosHprFromBlockNumber(blockNumber).getPos(render),
-                        base.cr.playGame.dnaStore.getDoorPosHprFromBlockNumber(blockNumber).getHpr(render),
-                        mapIndex=mapIndex)
+                    self.questBlocks.append(blockNumber)
+                    self.putBuildingMarker(base.cr.playGame.dnaStore.getDoorPosHprFromBlockNumber(blockNumber).getPos(render), base.cr.playGame.dnaStore.getDoorPosHprFromBlockNumber(blockNumber).getHpr(render), mapIndex=mapIndex, isSuitBlock=base.cr.playGame.dnaStore.isSuitBlock(blockNumber))
+                    continue
+
+        for blockIndex in xrange(base.cr.playGame.dnaStore.getNumBlockNumbers()):
+            blockNumber = base.cr.playGame.dnaStore.getBlockNumberAt(blockIndex)
+            if base.cr.playGame.dnaStore.isSuitBlock(blockNumber) and blockNumber not in self.questBlocks:
+                self.putSuitBuildingMarker(base.cr.playGame.dnaStore.getDoorPosHprFromBlockNumber(blockNumber).getPos(render), base.cr.playGame.dnaStore.getDoorPosHprFromBlockNumber(blockNumber).getHpr(render), blockNumber, base.cr.playGame.dnaStore.getSuitBlockTrack(blockNumber))
+            if base.cr.playGame.dnaStore.isCogdoBlock(blockNumber) and blockNumber not in self.questBlocks:
+                self.putCogdoBuildingMarker(base.cr.playGame.dnaStore.getDoorPosHprFromBlockNumber(blockNumber).getPos(render), base.cr.playGame.dnaStore.getDoorPosHprFromBlockNumber(blockNumber).getHpr(render), blockNumber, base.cr.playGame.dnaStore.getCogdoBlockTrack(blockNumber))
+                continue
 
     def transformAvPos(self, pos):
         if self.cornerPosInfo is None:
@@ -190,6 +248,11 @@ class QuestMap(DirectFrame):
                 buildingMarker.setScale((math.sin(task.time * 16.0 + i * math.pi / 3.0) + 1) * 0.005 + 0.04)
                 i = i + 1
 
+        for buildingMarker in self.suitBuildingMarkers:
+            if not buildingMarker.isEmpty():
+                buildingMarker.setScale((math.sin(task.time * 16.0 + i * math.pi / 3.0) + 1) * 0.005 + 0.04)
+                i = i + 1
+
         return Task.cont
 
     def updateMap(self):
@@ -201,6 +264,7 @@ class QuestMap(DirectFrame):
             except:
                 self.stop()
                 return
+
             mapImage = mapsGeom.find('**/%s_%s_english' % (ToontownGlobals.dnaMap[hoodId], zoneId))
             if not mapImage.isEmpty():
                 self.container['image'] = mapImage
@@ -272,13 +336,17 @@ class QuestMap(DirectFrame):
         for marker in self.buildingMarkers:
             marker.destroy()
 
+        for marker in self.suitBuildingMarkers:
+            marker.destroy()
+
         self.buildingMarkers = []
+        self.suitBuildingMarkers = []
+        self.questBlocks = []
         self.container.hide()
         self.hide()
         self.obscureButton()
         self.ignore('questPageUpdated')
         taskMgr.remove('questMapUpdate')
-        return
 
     def handleMarker(self):
         if hasattr(base.cr.playGame.getPlace(), 'isInterior') and base.cr.playGame.getPlace().isInterior:

@@ -1,4 +1,3 @@
-#Embedded file name: toontown.suit.SuitDNA
 import random
 from pandac.PandaModules import *
 from direct.directnotify.DirectNotifyGlobal import *
@@ -8,94 +7,15 @@ from direct.distributed.PyDatagram import PyDatagram
 from direct.distributed.PyDatagramIterator import PyDatagramIterator
 from otp.avatar import AvatarDNA
 notify = directNotify.newCategory('SuitDNA')
-suitHeadTypes = ['f',
- 'p',
- 'ym',
- 'mm',
- 'ds',
- 'hh',
- 'cr',
- 'tbc',
- 'bf',
- 'b',
- 'dt',
- 'ac',
- 'bs',
- 'sd',
- 'le',
- 'bw',
- 'sc',
- 'pp',
- 'tw',
- 'bc',
- 'nc',
- 'mb',
- 'ls',
- 'rb',
- 'cc',
- 'tm',
- 'nd',
- 'gh',
- 'ms',
- 'tf',
- 'm',
- 'mh',
- 'ca',
- 'cn',
- 'sw',
- 'mdm',
- 'txm',
- 'mg',
- 'bfh',
- 'hho']
-suitATypes = ['ds',
- 'hh',
- 'tbc',
- 'dt',
- 'bs',
- 'sd',
- 'bw',
- 'mb',
- 'nc',
- 'rb',
- 'ms',
- 'bc',
- 'gh',
- 'nd',
- 'tf',
- 'mh',
- 'sw',
- 'cc',
- 'tm',
- 'mg',
- 'hho']
-suitBTypes = ['p',
- 'ym',
- 'b',
- 'le',
- 'm',
- 'pp',
- 'br',
- 'txm',
- 'bfh',
- 'ms']
-suitCTypes = ['f',
- 'mm',
- 'cr',
- 'mdm',
- 'ls',
- 'cn',
- 'ac',
- 'bf',
- 'sc',
- 'tw',
- 'cc',
- 'ca']
-suitDepts = ['c',
- 'l',
- 'm',
- 's',
- 'g']
+suitHeadTypes = ['f', 'p', 'ym', 'mm', 'ds', 'hh', 'cr', 'tbc',
+ 'bf', 'b', 'dt', 'ac', 'bs', 'sd', 'le', 'bw',
+ 'sc', 'pp', 'tw', 'bc', 'nc', 'mb', 'ls', 'rb',
+ 'cc', 'tm', 'nd', 'gh', 'ms', 'tf', 'm', 'mh',
+ 'ca', 'cn', 'sw', 'mdm', 'txm', 'mg', 'bfh', 'hho']
+suitATypes = ['ym', 'hh', 'tbc', 'dt', 'bs', 'le', 'bw', 'pp', 'nc', 'rb', 'nd', 'tf', 'm', 'mh', 'sw', 'mdm', 'mg', 'hho']
+suitBTypes = ['p', 'ds', 'b', 'ac', 'sd', 'bc', 'br', 'ls', 'tm', 'ms', 'cn']
+suitCTypes = ['f', 'mm', 'cr', 'bf', 'sc', 'tw', 'mb', 'cc', 'gh', 'ca', 'txm', 'bfh']
+suitDepts = ['c', 'l', 'm', 's', 'g']
 suitDeptFullnames = {'c': TTLocalizer.Bossbot,
  'l': TTLocalizer.Lawbot,
  'm': TTLocalizer.Cashbot,
@@ -120,16 +40,8 @@ corpPolyColor = VBase4(0.95, 0.75, 0.75, 1.0)
 legalPolyColor = VBase4(0.75, 0.75, 0.95, 1.0)
 moneyPolyColor = VBase4(0.65, 0.95, 0.85, 1.0)
 salesPolyColor = VBase4(0.95, 0.75, 0.95, 1.0)
-boardPolyColor = VBase4(0.45, 0.45, 0.45, 1.0)
-suitsPerLevel = [1,
- 1,
- 1,
- 1,
- 1,
- 1,
- 1,
- 1,
- 1]
+boardPolyColor = VBase4(.45, 0.45, .45, 1.0)
+suitsPerLevel = [1, 1, 1, 1, 1, 1, 1, 1, 1]
 suitsPerDept = 8
 levelsPerSuit = 5
 goonTypes = ['pg', 'sg', 'gg']
@@ -137,26 +49,32 @@ goonTypes = ['pg', 'sg', 'gg']
 def getSuitBodyType(name):
     if name in suitATypes:
         return 'a'
-    if name in suitBTypes:
+    elif name in suitBTypes:
         return 'b'
-    if name in suitCTypes:
+    elif name in suitCTypes:
         return 'c'
-    print 'Unknown body type for suit name: ', name
+    else:
+        print 'Unknown body type for suit name: ', name
+    
+    return
 
 
 def getSuitDept(name):
     index = suitHeadTypes.index(name)
     if index < suitsPerDept:
         return suitDepts[0]
-    if index < suitsPerDept * 2:
+    elif index < suitsPerDept * 2:
         return suitDepts[1]
-    if index < suitsPerDept * 3:
+    elif index < suitsPerDept * 3:
         return suitDepts[2]
-    if index < suitsPerDept * 4:
+    elif index < suitsPerDept * 4:
         return suitDepts[3]
-    if index < suitsPerDept * 5:
+    elif index < suitsPerDept * 5:
         return suitDepts[4]
-    print 'Unknown dept for suit name: ', name
+    else:
+        print 'Unknown dept for suit name: ', name
+    
+    return 
 
 
 def getDeptFullname(dept):
@@ -177,7 +95,7 @@ def getSuitType(name):
 
 
 def getSuitName(deptIndex, typeIndex):
-    return suitHeadTypes[suitsPerDept * deptIndex + typeIndex]
+    return suitHeadTypes[(suitsPerDept*deptIndex) + typeIndex]
 
 
 def getRandomSuitType(level, rng = random):
@@ -193,12 +111,10 @@ def getRandomSuitByDept(dept):
     deptNumber = suitDepts.index(dept)
     return suitHeadTypes[suitsPerDept * deptNumber + random.randint(0, 7)]
 
-
 def getSuitsInDept(dept):
     start = dept * suitsPerDept
     end = start + suitsPerDept
     return suitHeadTypes[start:end]
-
 
 class SuitDNA(AvatarDNA.AvatarDNA):
 
@@ -234,6 +150,7 @@ class SuitDNA(AvatarDNA.AvatarDNA):
             notify.error('undefined avatar')
         else:
             notify.error('unknown avatar type: ', self.type)
+        
         return dg.getMessage()
 
     def makeFromNetString(self, string):
@@ -310,4 +227,5 @@ class SuitDNA(AvatarDNA.AvatarDNA):
             type = 'boss'
         else:
             notify.error('Invalid DNA type: ', self.type)
+        
         return type

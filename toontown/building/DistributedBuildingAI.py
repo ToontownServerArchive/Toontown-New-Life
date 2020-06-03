@@ -331,7 +331,6 @@ class DistributedBuildingAI(DistributedObjectAI.DistributedObjectAI):
             toon = None
             if t:
                 toon = self.getToon(t)
-                self.air.writeServerEvent('building-defeated', avId=t, track=self.track, numFloors=self.numFloors, zoneId=self.zoneId, victorList='%s' % victorList)
             if toon != None:
                 if self.track == 'l':
                     cogdoNumFloors = 3
@@ -357,12 +356,10 @@ class DistributedBuildingAI(DistributedObjectAI.DistributedObjectAI):
             self.accept(event, self.setVictorExited, extraArgs=[victor])
 
         self.b_setVictorList(victorList[:4])
-        self.updateSavedBy(savedBy)
         self.victorResponses = [0,
          0,
          0,
          0]
-        self.d_setState('waitForVictorsFromCogdo')
 
     def exitWaitForVictorsFromCogdo(self):
         self.victorResponses = None

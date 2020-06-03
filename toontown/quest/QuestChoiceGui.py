@@ -1,3 +1,4 @@
+#Embedded file name: toontown.quest.QuestChoiceGui
 from direct.gui.DirectGui import *
 from pandac.PandaModules import *
 from toontown.quest import QuestPoster
@@ -30,18 +31,18 @@ class QuestChoiceGui(DirectFrame):
             qp.showChoicePoster(questId, fromNpcId, toNpcId, rewardId, self.chooseQuest)
             self.questChoicePosters.append(qp)
 
-        if len(quests) == 1 * 3:
+        if len(quests) == 3:
             self['geom_scale'] = (1, 1, 0.9)
             self.questChoicePosters[0].setPos(0, 0, 0.1)
             self.cancelButton.setPos(0.15, 0, -0.375)
             self.timer.setPos(-0.2, 0, -0.35)
-        elif len(quests) == 2 * 3:
+        elif len(quests) == 6:
             self['geom_scale'] = (1.5, 1, 0.9)
             self.questChoicePosters[0].setPos(0, 0, -0.2)
             self.questChoicePosters[1].setPos(0, 0, 0.4)
             self.cancelButton.setPos(0.15, 0, -0.625)
             self.timer.setPos(-0.2, 0, -0.6)
-        elif len(quests) == 3 * 3:
+        elif len(quests) == 9:
             self['geom_scale'] = (1.85, 1, 0.9)
             map(lambda x: x.setScale(0.95), self.questChoicePosters)
             self.questChoicePosters[0].setPos(0, 0, -0.4)

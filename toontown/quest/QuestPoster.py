@@ -1,13 +1,12 @@
 from direct.gui.DirectGui import *
 from panda3d.core import *
 from panda3d.direct import *
-from toontown.quest import Quests
+import Quests
 import random
 from toontown.toon import NPCToons
 from toontown.toon import ToonHead
 from toontown.toon import ToonDNA
 from toontown.suit import SuitDNA
-from toontown.suit import BossCog
 from toontown.suit import Suit
 from toontown.hood import ZoneUtil
 from toontown.toonbase import ToontownGlobals
@@ -63,7 +62,6 @@ class QuestPoster(DirectFrame):
                0.42,
                0.22,
                1)}
-    unformattedTypes = [Quests.VPQuest, Quests.VPNewbieQuest, Quests.CFOQuest, Quests.CFONewbieQuest, Quests.CJQuest, Quests.CJNewbieQuest, Quests.CEOQuest, Quests.CEONewbieQuest]
     normalTextColor = (0.3,
      0.25,
      0.2,
@@ -84,7 +82,7 @@ class QuestPoster(DirectFrame):
         self.questFrame = DirectFrame(parent=self, relief=None)
         self.headline = DirectLabel(parent=self.questFrame, relief=None, text='', text_font=ToontownGlobals.getMinnieFont(), text_fg=self.normalTextColor, text_scale=0.05, text_align=TextNode.ACenter, text_wordwrap=12.0, textMayChange=1, pos=(0, 0, 0.23))
         self.questInfo = DirectLabel(parent=self.questFrame, relief=None, text='', text_fg=self.normalTextColor, text_scale=TEXT_SCALE, text_align=TextNode.ACenter, text_wordwrap=TEXT_WORDWRAP, textMayChange=1, pos=(0, 0, -0.0625))
-        self.rewardText = DirectLabel(parent=self.questFrame, relief=None, text='', text_fg=self.colors['rewardRed'], text_scale=0.0425, text_align=TextNode.ALeft, text_wordwrap=17.0, textMayChange=1, pos=(-0.36, 0, -0.26))
+        self.rewardText = DirectLabel(parent=self.questFrame, relief=None, text='', text_fg=self.colors['rewardRed'], text_scale=0.0425, text_align=TextNode.ALeft, text_wordwrap=17.0, textMayChange=1, pos=(-0.36, 0, -0.23))
         self.rewardText.hide()
         self.lPictureFrame = DirectFrame(parent=self.questFrame, relief=None, image=bookModel.find('**/questPictureFrame'), image_scale=IMAGE_SCALE_SMALL, text='', text_pos=(0, -0.11), text_fg=self.normalTextColor, text_scale=TEXT_SCALE, text_align=TextNode.ACenter, text_wordwrap=11.0, textMayChange=1)
         self.lPictureFrame.hide()
@@ -101,8 +99,6 @@ class QuestPoster(DirectFrame):
          -0.1,
          0.12), borderWidth=(0.025, 0.025), scale=0.2, frameColor=(0.945, 0.875, 0.706, 1.0), barColor=(0.5, 0.7, 0.5, 1), text='0/0', text_scale=0.19, text_fg=(0.05, 0.14, 0.4, 1), text_align=TextNode.ACenter, text_pos=(0, -0.04), pos=(0, 0, -0.195))
         self.questProgress.hide()
-        self.expLabel = DirectLabel(parent=self.questFrame, relief=None, text='', text_font=ToontownGlobals.getBuildingNametagFont(), text_fg=(0.0, 1.0, 0.439, 1.0), text_shadow=(0, 0, 0, 1), pos=(0.25, 0, 0.125), hpr=(0,0,35), scale=0.035)
-        self.expLabel.hide()
         self.funQuest = DirectLabel(parent=self.questFrame, relief=None, text=TTLocalizer.QuestPosterFun, text_fg=(0.0, 0.439, 1.0, 1.0), text_shadow=(0, 0, 0, 1), pos=(-0.2825, 0, 0.2), scale=0.03)
         self.funQuest.setR(-30)
         self.funQuest.hide()
@@ -133,8 +129,7 @@ class QuestPoster(DirectFrame):
         self.questInfo.setZ(-0.0625 + 0.03)
         self.questProgress.setZ(-0.195 + 0.03)
         self.auxText.setZ(0.12 + 0.03)
-        self.expLabel.setZ(0.125 + 0.03)
-        self.rewardText.setZ(-0.26 + 0.03)
+        self.funQuest.setZ(0.2 + 0.03)
         self.rewardText.show()
 
     def mouseExitPoster(self, event):
@@ -146,8 +141,7 @@ class QuestPoster(DirectFrame):
         self.questInfo.setZ(-0.0625)
         self.questProgress.setZ(-0.195)
         self.auxText.setZ(0.12)
-        self.expLabel.setZ(0.125)
-        self.rewardText.setZ(-0.26)
+        self.funQuest.setZ(0.2)
         self.rewardText.hide()
 
     def createNpcToonHead(self, toNpcId):
@@ -184,16 +178,6 @@ class QuestPoster(DirectFrame):
         suit.delete()
         suit = None
         return head
-		
-    def createBossHead(self, dept):
-        headModel = loader.loadModel(BossCog.ModelDict[dept] + '-head-zero')
-        headModel.setHpr(90, 0, -90)
-        head = hidden.attachNewNode('head')
-        copyHead = headModel.copyTo(head)
-        copyHead.setDepthTest(1)
-        copyHead.setDepthWrite(1)
-        self.fitGeometry(head, fFlip=1)
-        return head
 
     def loadElevator(self, building, numFloors, isCogdo=False):
         elevatorNodePath = hidden.attachNewNode('elevatorNodePath')
@@ -201,7 +185,6 @@ class QuestPoster(DirectFrame):
             elevatorModel = loader.loadModel('phase_4/models/modules/elevator')
         else:
             elevatorModel = loader.loadModel('phase_5/models/cogdominium/cogdominiumElevator')
-        elevatorModel = loader.loadModel('phase_4/models/modules/elevator')
         floorIndicator = [None,
          None,
          None,
@@ -209,7 +192,7 @@ class QuestPoster(DirectFrame):
          None,
          None]
         npc = elevatorModel.findAllMatches('**/floor_light_?;+s')
-        for i in xrange(npc.getNumPaths()):
+        for i in range(npc.getNumPaths()):
             np = npc.getPath(i)
             floor = int(np.getName()[-1:]) - 1
             floorIndicator[floor] = np
@@ -255,7 +238,6 @@ class QuestPoster(DirectFrame):
         self.funQuest.hide()
         self.lPictureFrame.hide()
         self.rPictureFrame.hide()
-        self.expLabel.hide()
         self.questProgress.hide()
         if hasattr(self, 'chooseButton'):
             self.chooseButton.destroy()
@@ -307,7 +289,6 @@ class QuestPoster(DirectFrame):
     def update(self, questDesc):
         questId, fromNpcId, toNpcId, rewardId, toonProgress = questDesc
         quest = Quests.getQuest(questId)
-        questExp = Quests.getQuestExp(questId)
         if quest == None:
             self.notify.warning('Tried to display poster for unknown quest %s' % questId)
             return
@@ -323,9 +304,6 @@ class QuestPoster(DirectFrame):
             rewardString = ''
         self.rewardText['text'] = rewardString
         self.fitLabel(self.rewardText)
-        if questExp != None:
-           self.expLabel['text'] = TTLocalizer.QuestPosterExp + str(questExp)
-           self.expLabel.show()
         if Quests.isQuestJustForFun(questId, rewardId):
             self.funQuest.show()
         else:
@@ -364,11 +342,7 @@ class QuestPoster(DirectFrame):
         auxTextPos = Vec3(0, 0, 0.12)
         headlineString = quest.getHeadlineString()
         objectiveStrings = quest.getObjectiveStrings()
-        wantFormat = self.checkFormat(quest.getType())
-        if not wantFormat:
-            captions = quest.getObjectiveStrings()
-        else:
-            captions = map(string.capwords, quest.getObjectiveStrings())
+        captions = map(string.capwords, quest.getObjectiveStrings())
         imageColor = Vec4(*self.colors['white'])
         if quest.getType() == Quests.DeliverGagQuest or quest.getType() == Quests.DeliverItemQuest:
             frameBgColor = 'red'
@@ -801,16 +775,20 @@ class QuestPoster(DirectFrame):
                 rIconGeomScale = 1
         elif quest.getType() == Quests.VPQuest:
             frameBgColor = 'blue'
-            lIconGeom = self.createBossHead('s')
-            lIconGeomScale = IMAGE_SCALE_SMALL
+            bookModel = loader.loadModel('phase_3.5/models/gui/stickerbook_gui')
+            lIconGeom = bookModel.find('**/BossHead3Icon')
+            bookModel.removeNode()
+            lIconGeomScale = 0.13
             if not fComplete:
                 infoText = quest.getLocationName()
                 if infoText == '':
                     infoText = TTLocalizer.QuestPosterAnywhere
         elif quest.getType() == Quests.VPNewbieQuest:
             frameBgColor = 'blue'
-            rIconGeom = self.createBossHead('s')
-            rIconGeomScale = IMAGE_SCALE_SMALL
+            bookModel = loader.loadModel('phase_3.5/models/gui/stickerbook_gui')
+            rIconGeom = bookModel.find('**/BossHead3Icon')
+            bookModel.removeNode()
+            rIconGeomScale = 0.13
             if not fComplete:
                 headlineString = TTLocalizer.QuestsNewbieQuestHeadline
                 captions = [quest.getCaption()]
@@ -830,74 +808,20 @@ class QuestPoster(DirectFrame):
                 rIconGeomScale = 1
         elif quest.getType() == Quests.CFOQuest:
             frameBgColor = 'blue'
-            lIconGeom = self.createBossHead('m')
-            lIconGeomScale = IMAGE_SCALE_SMALL
+            bookModel = loader.loadModel('phase_3.5/models/gui/stickerbook_gui')
+            lIconGeom = bookModel.find('**/CashBotBossHeadIcon')
+            bookModel.removeNode()
+            lIconGeomScale = 0.13
             if not fComplete:
                 infoText = quest.getLocationName()
                 if infoText == '':
                     infoText = TTLocalizer.QuestPosterAnywhere
         elif quest.getType() == Quests.CFONewbieQuest:
             frameBgColor = 'blue'
-            rIconGeom = self.createBossHead('m')
-            rIconGeomScale = IMAGE_SCALE_SMALL
-            if not fComplete:
-                headlineString = TTLocalizer.QuestsNewbieQuestHeadline
-                captions = [quest.getCaption()]
-                captions.append(map(string.capwords, quest.getObjectiveStrings()))
-                auxText = TTLocalizer.QuestsCogNewbieQuestAux
-                lPos.setX(-0.18)
-                self.laffMeter = self.createLaffMeter(quest.getNewbieLevel())
-                self.laffMeter.setScale(0.04)
-                lIconGeom = None
-                infoText = quest.getLocationName()
-                if infoText == '':
-                    infoText = TTLocalizer.QuestPosterAnywhere
-            else:
-                lIconGeom = rIconGeom
-                rIconGeom = None
-                lIconGeomScale = rIconGeomScale
-                rIconGeomScale = 1
-        elif quest.getType() == Quests.CJQuest:
-            frameBgColor = 'blue'
-            lIconGeom = self.createBossHead('l')
-            lIconGeomScale = IMAGE_SCALE_SMALL
-            if not fComplete:
-                infoText = quest.getLocationName()
-                if infoText == '':
-                    infoText = TTLocalizer.QuestPosterAnywhere
-        elif quest.getType() == Quests.CJNewbieQuest:
-            frameBgColor = 'blue'
-            rIconGeom = self.createBossHead('l')
-            rIconGeomScale = IMAGE_SCALE_SMALL
-            if not fComplete:
-                headlineString = TTLocalizer.QuestsNewbieQuestHeadline
-                captions = [quest.getCaption()]
-                captions.append(map(string.capwords, quest.getObjectiveStrings()))
-                auxText = TTLocalizer.QuestsCogNewbieQuestAux
-                lPos.setX(-0.18)
-                self.laffMeter = self.createLaffMeter(quest.getNewbieLevel())
-                self.laffMeter.setScale(0.04)
-                lIconGeom = None
-                infoText = quest.getLocationName()
-                if infoText == '':
-                    infoText = TTLocalizer.QuestPosterAnywhere
-            else:
-                lIconGeom = rIconGeom
-                rIconGeom = None
-                lIconGeomScale = rIconGeomScale
-                rIconGeomScale = 1
-        elif quest.getType() == Quests.CEOQuest:
-            frameBgColor = 'blue'
-            lIconGeom = self.createBossHead('c')
-            lIconGeomScale = IMAGE_SCALE_SMALL
-            if not fComplete:
-                infoText = quest.getLocationName()
-                if infoText == '':
-                    infoText = TTLocalizer.QuestPosterAnywhere
-        elif quest.getType() == Quests.CEONewbieQuest:
-            frameBgColor = 'blue'
-            rIconGeom = self.createBossHead('c')
-            rIconGeomScale = IMAGE_SCALE_SMALL
+            bookModel = loader.loadModel('phase_3.5/models/gui/stickerbook_gui')
+            rIconGeom = bookModel.find('**/CashBotBossHeadIcon')
+            bookModel.removeNode()
+            rIconGeomScale = 0.13
             if not fComplete:
                 headlineString = TTLocalizer.QuestsNewbieQuestHeadline
                 captions = [quest.getCaption()]
@@ -1015,15 +939,6 @@ class QuestPoster(DirectFrame):
                     icon = cogIcons.find('**/MoneyIcon')
                 elif dept == 'g':
                     icon = cogIcons.find('**/BoardIcon')
-                lIconGeom = icon.copyTo(hidden)
-                lIconGeom.setColor(Suit.Suit.medallionColors[dept])
-                cogIcons.removeNode()
-            if quest.getType() == Quests.CogTrackLevelQuest:
-                dept = quest.getCogTrack()
-                cogIcons = loader.loadModel('phase_3/models/gui/cog_icons')
-                lIconGeomScale = 0.13
-                if dept in SuitDNA.suitDeptModelPaths:
-                    icon = cogIcons.find(SuitDNA.suitDeptModelPaths[dept])
                 lIconGeom = icon.copyTo(hidden)
                 lIconGeom.setColor(Suit.Suit.medallionColors[dept])
                 cogIcons.removeNode()
@@ -1190,12 +1105,6 @@ class QuestPoster(DirectFrame):
 
     def unbindMouseEnter(self):
         self.unbind(DGG.WITHIN)
-
-    def checkFormat(self, questType):
-        if questType in self.unformattedTypes:
-            return False
-        else:
-            return True
 
     def showDeleteButton(self, questDesc):
         self.hideDeleteButton()

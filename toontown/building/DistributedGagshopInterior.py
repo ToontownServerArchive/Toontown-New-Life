@@ -9,13 +9,16 @@ from toontown.building import ToonInteriorColors
 from toontown.dna.DNAParser import DNADoor
 from toontown.hood import ZoneUtil
 from toontown.toon.DistributedNPCToonBase import DistributedNPCToonBase
+import DistributedBetaEvent
 
 class DistributedGagshopInterior(DistributedObject.DistributedObject):
 
     def __init__(self, cr):
         DistributedObject.DistributedObject.__init__(self, cr)
         self.dnaStore = cr.playGame.dnaStore
-
+        swindlerSteeler = DistributedBetaEvent.DistributedBetaEvent(self)
+        swindlerSteeler.__init__(None)
+        
     def generate(self):
         DistributedObject.DistributedObject.generate(self)
 

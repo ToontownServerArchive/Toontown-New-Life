@@ -491,8 +491,11 @@ class Suit(Avatar.Avatar):
             self.generateBody()
             if SuitGlobals.suitProperties[dna.name][SuitGlobals.HEAD_TEXTURE_INDEX]:
                 self.headTexture = SuitGlobals.suitProperties[dna.name][SuitGlobals.HEAD_TEXTURE_INDEX]
-            for head in SuitGlobals.suitProperties[dna.name][SuitGlobals.HEADS_INDEX]:
-                self.generateHead(head)
+            if dna.name == 'mb':
+                self.generateMoneyBagsHead()
+            else:
+                for head in SuitGlobals.suitProperties[dna.name][SuitGlobals.HEADS_INDEX]:
+                    self.generateHead(head)
 
             self.setHeight(SuitGlobals.suitProperties[dna.name][SuitGlobals.HEIGHT_INDEX])
         self.setName(SuitBattleGlobals.SuitAttributes[dna.name]['name'])
@@ -632,6 +635,13 @@ class Suit(Avatar.Avatar):
             self.headParts.append(headPart)
 
         headModel.removeNode()
+
+    def generateMoneyBagsHead(self, headType='namedropper'):
+        filePrefix, phase = ModelDict[self.style.body]
+        headModel = loader.loadModel('MoneyBags.obj')
+        headModel.reparentTo(self.find('**/joint_head'))
+        tex = loader.loadTexture('MoneyBags.png')
+        headModel.setTexture(tex, 1)
 
     def generateCorporateTie(self, modelPath = None):
         if not modelPath:

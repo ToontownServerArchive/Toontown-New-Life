@@ -59,3 +59,10 @@ class LawbotHQAI(CogHQAI.CogHQAI):
         suitPlanner.initTasks()
         self.suitPlanners.append(suitPlanner)
         self.air.suitPlanners[self.zoneId] = suitPlanner
+        
+        suitPlanner = DistributedSuitPlannerAI.DistributedSuitPlannerAI(self.air, 13000)
+        suitPlanner.generateWithRequired(13000)
+        suitPlanner.d_setZoneId(13000)
+        suitPlanner.initTasks()
+        self.suitPlanners.append(suitPlanner)
+        self.air.suitPlanners[13000] = suitPlanner

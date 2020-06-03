@@ -74,23 +74,7 @@ class TownBattleCogPanel(DirectFrame):
         gui.removeNode()
 
     def setCogInformation(self, cog):
-        self.cog = cog
-        self.updateHealthBar()
-        if self.head:
-            self.head.removeNode()
-        self.head = self.attachNewNode('head')
-        for part in cog.headParts:
-            copyPart = part.copyTo(self.head)
-            copyPart.setDepthTest(1)
-            copyPart.setDepthWrite(1)
-
-        p1, p2 = Point3(), Point3()
-        self.head.calcTightBounds(p1, p2)
-        d = p2 - p1
-        biggest = max(d[0], d[1], d[2])
-        s = 0.1 / biggest
-        self.head.setPosHprScale(0.1, 0, 0.01, 180, 0, 0, s, s, s)
-        self.setLevelText(cog.getActualLevel(), cog.getSkeleRevives())
+        pass
 
     def setLevelText(self, hp, revives = 0):
         if revives > 0:

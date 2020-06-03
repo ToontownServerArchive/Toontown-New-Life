@@ -37,6 +37,7 @@ class SellbotCogHQLoader(CogHQLoader.CogHQLoader):
         self.cogHQExteriorModelPath = 'phase_9/models/cogHQ/SellbotHQExterior'
         self.cogHQLobbyModelPath = 'phase_9/models/cogHQ/SellbotHQLobby'
         self.factoryExteriorModelPath = 'phase_9/models/cogHQ/SellbotFactoryExterior'
+        self.cogHQLobbyModelPath2 = 'phase_11/models/lawbotHQ/LB_CH_Lobby'
         self.geom = None
         self.spot1Sequence = None
         self.spot2Sequence = None
@@ -192,6 +193,13 @@ class SellbotCogHQLoader(CogHQLoader.CogHQLoader):
             door.find('**/leftDoor').wrtReparentTo(parent)
             door.find('**/rightDoor').wrtReparentTo(parent)
             self.geom.flattenStrong()
+        elif zoneId == ToontownGlobals.SellbotSalesEntry:
+            if base.config.GetBool('want-qa-regression', 0):
+                self.notify.info('QA-REGRESSION: COGHQ: Visit SellbotLobby')
+            self.geom = loader.loadModel(self.cogHQLobbyModelPath2)
+            self.geom.flattenStrong()
+            ug = self.geom.find('**/underground')
+            ug.setBin('ground', -10)
         else:
             self.notify.warning('loadPlaceGeom: unclassified zone %s' % zoneId)
         CogHQLoader.CogHQLoader.loadPlaceGeom(self, zoneId)
